@@ -1,0 +1,108 @@
+<head>
+  <title>Creatbox</title>
+</head>
+
+<body>
+	<!-- floating UI box -->
+    <div class="ui world-select" style="z-index:100;display:none;">
+        <h1>Worlds:</h1>
+        <ul>
+            {{#each worlds}}
+                <li><button class="world-item" id="{{name}}">{{name}}</button></li>
+            {{/each}}
+        </ul>
+        <button class="btn close-select-world">X</button>
+    </div>
+	<div class="ui main-panel">
+		<h1>Creatbox</h1>
+		<p class="subtitle">by laosb</p>
+        {{> loginButtons}}<br>
+        <button class="btn select-world">选择当前世界</button>
+		<h2>模式</h2>
+		<button class="view-mode btn {{#unless buildMode}}active{{/unless}}">
+			查看</button>
+		<button class="build-mode btn {{#if buildMode}}active{{/if}}">
+			建筑</button>
+
+		{{#if buildMode}}
+			<h2>操作</h2>
+			<p>左键放置方块</p>
+			<p>右键破坏方块</p>
+			<!-- <button class="clear-boxes btn">推倒重来</button> -->
+            <div class="color-picker">
+				<h2>方块类型</h2>
+				{{#each types}}
+					<div class="type-swatch swatch{{#if activeType}} active{{/if}}" style="background-image: url('img/blocks/{{name}}/normal.png');">
+						{{name}}
+					</div>
+				{{/each}}
+			</div>
+			<div class="color-picker pick-color">
+				<h2>方块颜色</h2>
+				{{#each colors}}
+                 {{#if currentTypeIsNormal}}
+					<div class="color-swatch swatch{{#if activeColor}} active{{/if}}" style="background-color: {{code}}">
+                        {{name}}
+					</div>
+                        {{else}}
+                        <div class="color-swatch swatch{{#if activeType}} active{{/if}}" style="background-image: url('img/blocks/{{currentType}}/{{name}}.png');">
+                            {{name}}
+					</div>
+                    {{/if}}
+						
+				{{/each}}
+			</div>
+		{{else}}
+			<p>拖拽以旋转视角</p>
+			<p>双击以改变视角中心</p>
+			<p>滚动滚轮以缩放</p>
+		{{/if}}
+	</div>
+
+	<!-- super fun 3D stuff! -->
+  <x3d class="{{#if buildMode}}build{{/if}}">
+	  <scene>
+	  	<!-- camera/scene settings -->
+	  	<viewpoint position="8.19 12.33 19.5"
+	  		orientation="-0.834 0.55 0 0.65"></viewpoint>
+      <navigationinfo type="turntable" headlight="true"></navigationinfo>
+	  	
+	  	<!-- lights -->
+        <pointLight location="0 200 0" intensity="0.3"></pointLight>
+	  	<!-- <pointLight location="-30 10 -20" intensity="0.7"></pointLight> -->
+	  	<directionalLight direction="0 -200 0" color="#fff"
+	  		intensity="0.5" shadowIntensity="0.4"></directionalLight>
+	  	
+	  	<!-- ground -->
+	  	<transform rotation="-1.5707963267948966 0 0 1.5707963267948966">
+		  	<shape>
+		  		<appearance>
+		  			<!-- XXX could be improved to a grass texture -->
+			  		<!-- <material diffuseColor="#4A9"></material> -->
+                    <ImageTexture  url="img/ground.jpg?oo"></ImageTexture>
+			  	</appearance>
+			  	<plane size="6000 3000"></plane>
+			  </shape>
+			</transform>
+
+			<!-- boxes -->
+	  	{{#each boxes}}
+	  		<!-- scale 0.5 because default size of box is 2 units on a side -->
+	  		<transform translation="{{x}} {{y}} {{z}}" scale="0.5 0.5 0.5">
+			    <shape id="{{_id}}">
+			      <appearance>
+			      	<!-- could be improved to have texture and not just color -->
+                      {{#if isNormal type}}
+			           <material diffuseColor="{{color}}" ambientIntensity="0.1"
+			        	shininess="10"></material> 
+                      {{else}}
+                    <Texture  url="img/blocks/{{type}}/{{color}}.png"></Texture>
+                      {{/if}}
+			      </appearance>
+			      <box></box>
+			    </shape>
+			  </transform>
+	    {{/each}}
+	  </scene>
+	</x3d>
+</body>
